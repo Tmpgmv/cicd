@@ -11,7 +11,7 @@ public class GreetingController {
     @GetMapping("/greeting")
     public String greeting(@RequestParam(name="name",
                                          required=false,
-                                         defaultValue="Student") String name,
+                                         defaultValue="Teacher") String name,
                                          Model model) {
         model.addAttribute("name", name);
         return "greeting";
