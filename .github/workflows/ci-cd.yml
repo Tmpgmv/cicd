@@ -52,6 +52,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             set -e
+            export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+            export PATH=$JAVA_HOME/bin:$PATH            
             cd /root/cicd 
             git pull
             ./gradlew bootJar
