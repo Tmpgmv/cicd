@@ -10,10 +10,9 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      # 1. Checkout repository
       - uses: actions/checkout@v4
 
-      # 2. Setup Java
+      # 1. Использовать Java
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -21,23 +20,23 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      # 3. Make gradlew executable
+      # 3. Gradlew сдеть исполняемым файлом.
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 4. Build JAR
+      # 4. Собрсть JAR
       - name: Build with Gradle
         run: ./gradlew bootJar
 
-      # 5. Run tests
-      - name: Run tests with Gradle
+      # 5. Запустить тесты
+      - name: Run tests wалith Gradle
         id: tests
         run: ./gradlew check --rerun-tasks
 
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-test
-    if: ${{ success() }}        # Only run if previous job succeeded
+    if: ${{ success() }}        # Только если предыдущий шаг успешен.
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.3
