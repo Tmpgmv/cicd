@@ -1,13 +1,15 @@
-name: Java CI with Gradle
+name: ci-cd
 
-on:
+# https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow
+
+on: # Триггеры
   push:
-    branches: ["main"]
+    branches: ["main"] # Запускать workflow при каждом пуше в репозиторий
   pull_request:
-    branches: ["main"]
+    branches: ["main"] # Запускать workflow при создании pull request.
 
 jobs:
-  build-and-test:
+  build-and-test: # Собрать и тестировать
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,15 +22,15 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      # 3. Gradlew сдеть исполняемым файлом.
+      # 2. Gradlew сдеть исполняемым файлом.
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 4. Собрсть JAR
+      # 3. Собрсть JAR
       - name: Build with Gradle
         run: ./gradlew bootJar
 
-      # 5. Запустить тесты
+      # 4. Запустить тесты
       - name: Run tests wалith Gradle
         id: tests
         run: ./gradlew check --rerun-tasks
@@ -36,8 +38,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-test
-    if: ${{ success() }}        # Только если предыдущий шаг успешен.
-    steps:
+    if: ${{ success() }} # Только если предыдущий шаг успешен.
+    steps: # Перейти в нужный каталог.
+           # Выполнить pull.
+           # Перезапустить приложение.
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.3
         with:
@@ -46,6 +50,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             set -e
-            cd /root/cicd
+            cd /root/cicd 
             git pull
             sudo systemctl restart hw.service
