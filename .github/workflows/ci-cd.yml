@@ -41,6 +41,8 @@ jobs:
     if: ${{ success() }} # Только если предыдущий шаг успешен.
     steps: # Перейти в нужный каталог.
            # Выполнить pull.
+           # Собрать на сервере. Иначе изменения в коде не приведут к видимому результату
+           # в работе приложения.
            # Перезапустить приложение.
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.3
@@ -52,4 +54,5 @@ jobs:
             set -e
             cd /root/cicd 
             git pull
+            ./gradlew bootJar
             sudo systemctl restart hw.service
