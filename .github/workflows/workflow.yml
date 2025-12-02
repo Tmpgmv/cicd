@@ -46,6 +46,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             set -e
-            cd /root
+            cd /root/cicd
             git pull
             sudo systemctl restart hw.service
