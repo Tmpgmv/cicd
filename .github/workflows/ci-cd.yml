@@ -5,8 +5,6 @@ name: ci-cd
 on: # Триггеры
   push:
     branches: ["main"] # Запускать workflow при каждом пуше в репозиторий
-#  pull_request:
-#    branches: ["main"] # Запускать workflow при создании pull request.
 
 jobs:
   build-and-test: # Собрать и тестировать
@@ -14,19 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. Использовать Java
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'gradle'
-
       # 2. Gradlew сдеть исполняемым файлом.
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 3. Собрсть JAR
+      # 3. Собрать JAR
       - name: Build with Gradle
         run: ./gradlew bootJar
 
@@ -44,17 +34,11 @@ jobs:
            # Собрать на сервере. Иначе изменения в коде не приведут к видимому результату
            # в работе приложения.
            # Перезапустить приложение.
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.2.3
-        with:
-          host: ${{ secrets.IP }}
-          username: ${{ secrets.USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            set -e
-            cd /root/cicd
-            git pull
-            export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-            export PATH=$JAVA_HOME/bin:$PATH
-            ./gradlew --no-daemon bootJar
-            sudo systemctl restart hw.service
+    - name: Upload jar
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.IP }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        source: "build/libs/*.jar"
+        target: "/root/cicd/serving-web-content-0.0.1-SNAPSHOT.jar"
