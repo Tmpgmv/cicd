@@ -46,4 +46,4 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           source: "./artifact/*.jar"
-          target: "/root/cicd/app.jar"
+          target: "/root/cicd"
