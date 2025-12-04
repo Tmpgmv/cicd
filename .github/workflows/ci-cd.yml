@@ -5,8 +5,8 @@ name: ci-cd
 on: # Триггеры
   push:
     branches: ["main"] # Запускать workflow при каждом пуше в репозиторий
-  pull_request:
-    branches: ["main"] # Запускать workflow при создании pull request.
+#  pull_request:
+#    branches: ["main"] # Запускать workflow при создании pull request.
 
 jobs:
   build-and-test: # Собрать и тестировать
@@ -53,6 +53,7 @@ jobs:
           script: |
             set -e
             cd /root/cicd
+            git pull
             export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
             export PATH=$JAVA_HOME/bin:$PATH
             ./gradlew --no-daemon bootJar
