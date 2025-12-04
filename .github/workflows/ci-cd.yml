@@ -39,7 +39,7 @@ jobs:
           path: ./artifact
 
       - name: Rename the jar-file.
-        run: mv *.jar app.jar
+        run: mv ./artifact/*.jar ./artifact/app.jar
 
       # Upload JAR to the server
       - name: Upload jar via SCP
