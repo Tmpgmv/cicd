@@ -46,4 +46,12 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           source: "./artifact/*.jar"
+          strip_components: 1
           target: "/root/cicd"
+      - name: Run on server
+        uses: appleboy/ssh-action@v1.2.3
+        with:
+          host: ${{ secrets.IP }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: systemctl restart hw.service
