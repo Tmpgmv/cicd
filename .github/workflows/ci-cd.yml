@@ -1,44 +1,49 @@
 name: ci-cd
 
-# https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow
-
-on: # Триггеры
+on:
   push:
-    branches: ["main"] # Запускать workflow при каждом пуше в репозиторий
+    branches: ["main"]
 
 jobs:
-  build-and-test: # Собрать и тестировать
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      # 2. Gradlew сдеть исполняемым файлом.
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 3. Собрать JAR
-      - name: Build with Gradle
+      - name: Build JAR
         run: ./gradlew bootJar
 
-      # 4. Запустить тесты
-      - name: Run tests wалith Gradle
-        id: tests
+      - name: Run tests
         run: ./gradlew check --rerun-tasks
+
+      # NEW: Upload built JAR
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/*.jar
 
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-test
-    if: ${{ success() }} # Только если предыдущий шаг успешен.
-    steps: # Перейти в нужный каталог.
-           # Выполнить pull.
-           # Собрать на сервере. Иначе изменения в коде не приведут к видимому результату
-           # в работе приложения.
-           # Перезапустить приложение.
-    - name: Upload jar
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.IP }}
-        username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_KEY }}
-        source: "build/libs/serving-web-content-0.0.1-SNAPSHOT.jar"
-        target: "/root/cicd/serving-web-content-0.0.1-SNAPSHOT.jar"
+
+    steps:
+      # NEW: Download the JAR file
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: ./artifact
+
+      # Upload JAR to the server
+      - name: Upload jar via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.IP }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "./artifact/*.jar"
+          target: "/root/cicd/app.jar"
