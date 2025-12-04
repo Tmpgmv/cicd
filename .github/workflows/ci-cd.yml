@@ -38,6 +38,9 @@ jobs:
           name: app-jar
           path: ./artifact
 
+      - name: Rename the jar-file.
+        run: mv *.jar app.jar
+
       # Upload JAR to the server
       - name: Upload jar via SCP
         uses: appleboy/scp-action@v0.1.7
